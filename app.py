@@ -769,7 +769,7 @@ def show_calculator():
     if st.button("🧮 Calculate Emissions & Issue Token", type="primary") and energy_data:
         if not sme_id or not sme_name:
             st.error("Please fill in Business ID and Name")
-            return
+            st.stop()
         
         with st.spinner("Calculating emissions and generating verification..."):
             # Calculate for each month
@@ -798,59 +798,8 @@ def show_calculator():
             total_reduction = sum(r['reduction_tonnes'] for r in results)
             avg_efficiency = sum(r['efficiency_ratio'] for r in results) / len(results)
             
-            # Display results
-            st.success("✅ Calculation Complete!")
-            
-            st.markdown("<br>", unsafe_allow_html=True)
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                st.markdown(f"""
-                <div class="metric-glass-card">
-                    <div class="metric-label">Total Energy</div>
-                    <div class="metric-value" style="font-size: 2rem;">{total_energy:.0f}</div>
-                    <div class="metric-label" style="font-size: 0.9rem;">kWh</div>
-                </div>
-                """, unsafe_allow_html=True)
-            with col2:
-                st.markdown(f"""
-                <div class="metric-glass-card">
-                    <div class="metric-label">CO₂ Emissions</div>
-                    <div class="metric-value" style="font-size: 2rem;">{total_emissions:.2f}</div>
-                    <div class="metric-label" style="font-size: 0.9rem;">tonnes</div>
-                </div>
-                """, unsafe_allow_html=True)
-            with col3:
-                reduction_pct = (total_reduction/total_emissions*100) if total_emissions > 0 else 0
-                st.markdown(f"""
-                <div class="metric-glass-card">
-                    <div class="metric-label">Reduction</div>
-                    <div class="metric-value" style="font-size: 2rem;">{total_reduction:.2f}</div>
-                    <div class="metric-label" style="font-size: 0.9rem;">tonnes ({reduction_pct:.1f}%)</div>
-                </div>
-                """, unsafe_allow_html=True)
-            with col4:
-                efficiency_status = "Excellent" if avg_efficiency < 0.7 else "Good" if avg_efficiency < 1.0 else "Needs Improvement"
-                st.markdown(f"""
-                <div class="metric-glass-card">
-                    <div class="metric-label">Efficiency</div>
-                    <div class="metric-value" style="font-size: 1.8rem;">{efficiency_status}</div>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            # Results table
-            st.subheader("Monthly Breakdown")
-            results_df = pd.DataFrame(results)
-            st.dataframe(results_df.style.format({
-                'energy_kwh': '{:.0f}',
-                'emissions_tonnes': '{:.4f}',
-                'baseline_emissions': '{:.4f}',
-                'reduction_tonnes': '{:.4f}',
-                'efficiency_ratio': '{:.2f}'
-            }))
-            
-            # Issue Green Token
+            # Issue Green Token immediately if reduction > 0
             if total_reduction > 0:
-                st.subheader("🎖️ Verified Green Token")
                 token = issue_green_token(
                     sme_id=sme_id,
                     sme_name=sme_name,
@@ -859,6 +808,82 @@ def show_calculator():
                     energy_consumed=total_energy,
                     region=region
                 )
+                
+                # Store calculation results in session state for persistence
+                st.session_state.current_calculation = {
+                    'total_energy': total_energy,
+                    'total_emissions': total_emissions,
+                    'total_reduction': total_reduction,
+                    'avg_efficiency': avg_efficiency,
+                    'results': results,
+                    'token': token,
+                    'sme_id': sme_id,
+                    'sme_name': sme_name,
+                    'industry': industry,
+                    'region': region
+                }
+                st.session_state.show_current_results = True
+            else:
+                st.session_state.show_current_results = False
+                st.warning("Your emissions are higher than the industry baseline. Consider implementing energy efficiency measures.")
+    
+    # Display results if they exist in session state
+    if st.session_state.get('show_current_results', False) and 'current_calculation' in st.session_state:
+        calc = st.session_state.current_calculation
+        
+        # Display results
+        st.success("✅ Calculation Complete!")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.markdown(f"""
+            <div class="metric-glass-card">
+                <div class="metric-label">Total Energy</div>
+                <div class="metric-value" style="font-size: 2rem;">{calc['total_energy']:.0f}</div>
+                <div class="metric-label" style="font-size: 0.9rem;">kWh</div>
+            </div>
+            """, unsafe_allow_html=True)
+        with col2:
+            st.markdown(f"""
+            <div class="metric-glass-card">
+                <div class="metric-label">CO₂ Emissions</div>
+                <div class="metric-value" style="font-size: 2rem;">{calc['total_emissions']:.2f}</div>
+                <div class="metric-label" style="font-size: 0.9rem;">tonnes</div>
+            </div>
+            """, unsafe_allow_html=True)
+        with col3:
+            reduction_pct = (calc['total_reduction']/calc['total_emissions']*100) if calc['total_emissions'] > 0 else 0
+            st.markdown(f"""
+            <div class="metric-glass-card">
+                <div class="metric-label">Reduction</div>
+                <div class="metric-value" style="font-size: 2rem;">{calc['total_reduction']:.2f}</div>
+                <div class="metric-label" style="font-size: 0.9rem;">tonnes ({reduction_pct:.1f}%)</div>
+            </div>
+            """, unsafe_allow_html=True)
+        with col4:
+            efficiency_status = "Excellent" if calc['avg_efficiency'] < 0.7 else "Good" if calc['avg_efficiency'] < 1.0 else "Needs Improvement"
+            st.markdown(f"""
+            <div class="metric-glass-card">
+                <div class="metric-label">Efficiency</div>
+                <div class="metric-value" style="font-size: 1.8rem;">{efficiency_status}</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # Results table
+        st.subheader("Monthly Breakdown")
+        results_df = pd.DataFrame(calc['results'])
+        st.dataframe(results_df.style.format({
+            'energy_kwh': '{:.0f}',
+            'emissions_tonnes': '{:.4f}',
+            'baseline_emissions': '{:.4f}',
+            'reduction_tonnes': '{:.4f}',
+            'efficiency_ratio': '{:.2f}'
+        }))
+        
+        # Show token
+        token = calc['token']
+        st.subheader("🎖️ Verified Green Token")
                 
                 st.success(f"✅ Green Token Issued: {token['token_id']}")
                 
@@ -890,46 +915,30 @@ def show_calculator():
                 # Generate certificate
                 st.subheader("📄 Download Sustainability Certificate")
                 
-                # Store latest token ID in session state for certificate generation
-                if 'latest_token_id' not in st.session_state or st.session_state.latest_token_id != token['token_id']:
-                    st.session_state.latest_token_id = token['token_id']
-                
                 if st.button("Generate Certificate", key="gen_cert_calc"):
                     with st.spinner("Generating certificate..."):
                         try:
-                            # Get the token from session state tokens list
-                            latest_token = None
-                            for t in st.session_state.tokens:
-                                if t['token_id'] == st.session_state.latest_token_id:
-                                    latest_token = t
-                                    break
+                            cert_generator = st.session_state.certificate_generator
                             
-                            if latest_token is None:
-                                st.error("❌ Token not found. Please recalculate emissions.")
-                            else:
-                                cert_generator = st.session_state.certificate_generator
-                                
-                                st.info("Generating certificate...")
-                                
-                                pdf_bytes = cert_generator.generate_certificate(latest_token)
-                                
-                                st.success("✅ Certificate generated successfully!")
-                                
-                                st.download_button(
-                                    label="📥 Download Certificate (PDF)",
-                                    data=pdf_bytes,
-                                    file_name=f"Sustainability_Certificate_{latest_token['token_id']}.pdf",
-                                    mime="application/pdf",
-                                    key="dl_cert_calc"
-                                )
+                            st.info("Generating certificate...")
+                            
+                            pdf_bytes = cert_generator.generate_certificate(token)
+                            
+                            st.success("✅ Certificate generated successfully!")
+                            
+                            st.download_button(
+                                label="📥 Download Certificate (PDF)",
+                                data=pdf_bytes,
+                                file_name=f"Sustainability_Certificate_{token['token_id']}.pdf",
+                                mime="application/pdf",
+                                key="dl_cert_calc"
+                            )
                         except Exception as e:
                             st.error(f"❌ Error generating certificate: {str(e)}")
                             st.error(f"Error type: {type(e).__name__}")
                             import traceback
                             st.code(traceback.format_exc())
                             st.info("💡 Please try again or contact support if the issue persists.")
-            else:
-                st.warning("Your emissions are higher than the industry baseline. Consider implementing energy efficiency measures.")
 
 def show_tokens():
     st.header("🎖️ My Green Tokens")
