@@ -209,7 +209,7 @@ class CertificateGenerator:
         # Verification title
         c.setFont("Helvetica-Bold", 10)
         c.setFillColor(colors.HexColor('#424242'))
-        c.drawString(box_x + 10, y - 20, "BLOCKCHAIN VERIFICATION")
+        c.drawString(box_x + 10, y - 20, "CRYPTOGRAPHIC VERIFICATION")
         
         # Verification details
         c.setFont("Courier", 8)
