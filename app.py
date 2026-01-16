@@ -682,14 +682,15 @@ def show_dashboard():
         st.subheader("Recent Green Tokens")
         recent_tokens = st.session_state.tokens[-5:]
         for token in reversed(recent_tokens):
+            emissions_reduced_tonnes = token['emissions_reduced_kg'] / 1000
             with st.expander(f"🎖️ {token['token_id']} - {token['sme_name']}"):
                 col1, col2 = st.columns(2)
                 with col1:
-                    st.write(f"**Emissions Reduced:** {token['emissions_reduced_tonnes']:.4f} tonnes CO₂")
-                    st.write(f"**Industry:** {token['industry']}")
+                    st.write(f"**Emissions Reduced:** {emissions_reduced_tonnes:.4f} tonnes ({token['emissions_reduced_kg']:.0f} kg)")
+                    st.write(f"**Business Type:** {token['business_type']}")
                 with col2:
                     st.write(f"**Date:** {token['timestamp'][:10]}")
-                    st.write(f"**Status:** ✅ {token['status']}")
+                    st.write(f"**Status:** ✅ {token['status'].upper()}")
 
 def show_calculator():
     st.header("📊 Carbon Emissions Calculator")
@@ -853,8 +854,8 @@ def show_calculator():
                 token = issue_green_token(
                     sme_id=sme_id,
                     sme_name=sme_name,
-                    industry=industry,
-                    emissions_reduced=total_reduction,
+                    business_type=industry,
+                    emissions_reduced_kg=total_reduction * 1000,  # Convert tonnes to kg
                     energy_consumed=total_energy,
                     region=region
                 )
@@ -1057,13 +1058,15 @@ Blockchain Simulation: Active
         # Create public view (without sensitive data)
         public_tokens = []
         for token in st.session_state.tokens:
+            emissions_reduced_tonnes = token['emissions_reduced_kg'] / 1000
             public_tokens.append({
                 "Token ID": token['token_id'],
-                "Industry": token['industry'],
-                "CO₂ Reduced (tonnes)": f"{token['emissions_reduced_tonnes']:.4f}",
+                "Business Type": token['business_type'],
+                "CO₂ Reduced (tonnes)": f"{emissions_reduced_tonnes:.4f}",
+                "CO₂ Reduced (kg)": f"{token['emissions_reduced_kg']:.0f}",
                 "Date": token['timestamp'][:10],
                 "Status": token['status'],
-                "Hash Preview": token['verification_hash'][:16] + "..."
+                "Hash Preview": token['hash'][:16] + "..."
             })
         
         df = pd.DataFrame(public_tokens)
@@ -1201,7 +1204,7 @@ def show_insights():
         
         if st.session_state.tokens:
             latest_token = st.session_state.tokens[-1]
-            industry = latest_token['industry']
+            business_type = latest_token['business_type']
             
             comparison_data = {
                 "Metric": ["Energy Efficiency", "Carbon Intensity", "Sustainability Score"],
