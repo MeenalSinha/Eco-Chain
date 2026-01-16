@@ -58,17 +58,12 @@ No auditors. No expensive compliance. No greenwashing.
 
 ## Core Features
 
-**Carbon Proof Generator** - Upload bills/manual entry, calculate vs industry baseline, 5 industries × 5 regions
-
-**Verified Green Tokens** - SHA-256 secured with Merkle tree simulation, unique ID + hash + timestamp
-
-**Downloadable Certificates** - Professional PDFs with QR codes, displays kg and tonnes for clarity
-
-**Interactive Dashboard** - Emissions trends, performance badges, token registry, impact equivalents
-
-**Data-Driven Recommendations** - Rule-based suggestions with costs, payback periods, priority ranking
-
-**Public Verification** - Hash validation, transparent registry, blockchain-style proof of inclusion
+- **Carbon Proof Generator** - Upload bills/manual entry, calculate vs industry baseline, 5 industries × 5 regions
+- **Verified Green Tokens** - SHA-256 secured with Merkle tree simulation, unique ID + hash + timestamp
+- **Downloadable Certificates** - Professional PDFs with QR codes, displays kg and tonnes for clarity
+- **Interactive Dashboard** - Emissions trends, performance badges, token registry, impact equivalents
+- **Data-Driven Recommendations** - Rule-based suggestions with costs, payback periods, priority ranking
+- **Public Verification** - Hash validation, transparent registry, blockchain-style proof of inclusion
 
 ---
 
@@ -189,6 +184,14 @@ February 2025,7800
 ## Additional Documentation
 
 - **sample_data.csv** - Test data included
+
+---
+
+## Build Process & AI Tool Usage
+
+This project was designed and implemented by me end-to-end, including problem framing, system architecture, emissions logic, and verification flow. I used AI tools (ChatGPT and Claude) primarily as coding and thinking assistants—for debugging, validating edge cases, and discussing alternative approaches.
+
+All final design decisions, trade-offs, and implementation choices were made by me. Several suggestions from AI tools were rejected or modified once tested against the actual data flow and project constraints. If rebuilt again, I would spend more time earlier validating assumptions with real SME data before expanding features.
 
 ---
 
