@@ -889,21 +889,31 @@ def show_calculator():
                 
                 # Generate certificate
                 st.subheader("📄 Download Sustainability Certificate")
-                if st.button("Generate Certificate"):
-                    try:
-                        cert_generator = st.session_state.certificate_generator
-                        pdf_bytes = cert_generator.generate_certificate(token)
-                        
-                        st.download_button(
-                            label="📥 Download Certificate (PDF)",
-                            data=pdf_bytes,
-                            file_name=f"Sustainability_Certificate_{token['token_id']}.pdf",
-                            mime="application/pdf"
-                        )
-                        st.success("✅ Certificate generated successfully!")
-                    except Exception as e:
-                        st.error(f"Error generating certificate: {str(e)}")
-                        st.info("Using fallback certificate generation...")
+                if st.button("Generate Certificate", key="gen_cert_calc"):
+                    with st.spinner("Generating certificate..."):
+                        try:
+                            cert_generator = st.session_state.certificate_generator
+                            
+                            # Debug: Show token structure
+                            st.info("Token structure confirmed. Generating PDF...")
+                            
+                            pdf_bytes = cert_generator.generate_certificate(token)
+                            
+                            st.success("✅ Certificate generated successfully!")
+                            
+                            st.download_button(
+                                label="📥 Download Certificate (PDF)",
+                                data=pdf_bytes,
+                                file_name=f"Sustainability_Certificate_{token['token_id']}.pdf",
+                                mime="application/pdf",
+                                key="dl_cert_calc"
+                            )
+                        except Exception as e:
+                            st.error(f"❌ Error generating certificate: {str(e)}")
+                            st.error(f"Error type: {type(e).__name__}")
+                            import traceback
+                            st.code(traceback.format_exc())
+                            st.info("💡 Please try again or contact support if the issue persists.")
             else:
                 st.warning("Your emissions are higher than the industry baseline. Consider implementing energy efficiency measures.")
 
@@ -960,19 +970,25 @@ def show_tokens():
             # Download certificate button
             col1, col2 = st.columns(2)
             with col1:
-                if st.button(f"📥 Download Certificate", key=f"cert_{token['token_id']}"):
-                    try:
-                        cert_generator = st.session_state.certificate_generator
-                        pdf_bytes = cert_generator.generate_certificate(token)
-                        st.download_button(
-                            label="Save Certificate",
-                            data=pdf_bytes,
-                            file_name=f"Certificate_{token['token_id']}.pdf",
-                            mime="application/pdf",
-                            key=f"dl_{token['token_id']}"
-                        )
-                    except Exception as e:
-                        st.error(f"Error: {str(e)}")
+                if st.button(f"📥 Generate Certificate", key=f"cert_{token['token_id']}"):
+                    with st.spinner("Generating certificate..."):
+                        try:
+                            cert_generator = st.session_state.certificate_generator
+                            pdf_bytes = cert_generator.generate_certificate(token)
+                            
+                            st.success("✅ Certificate ready!")
+                            st.download_button(
+                                label="💾 Download PDF",
+                                data=pdf_bytes,
+                                file_name=f"Certificate_{token['token_id']}.pdf",
+                                mime="application/pdf",
+                                key=f"dl_{token['token_id']}"
+                            )
+                        except Exception as e:
+                            st.error(f"❌ Error: {str(e)}")
+                            import traceback
+                            with st.expander("Debug Info"):
+                                st.code(traceback.format_exc())
             
             with col2:
                 verification_url = f"https://eco-chain.verify/{token['hash']}"
