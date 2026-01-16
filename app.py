@@ -1264,6 +1264,14 @@ def show_insights():
         # Calculate total reduction from kg field
         total_reduction = sum(t['emissions_reduced_kg'] / 1000 for t in st.session_state.tokens)
         
+        # Calculate environmental equivalents
+        # 1 tree absorbs ~21 kg CO2 per year
+        trees = int(total_reduction * 1000 / 21)
+        # Average car emits ~4.6 tonnes CO2 per year
+        cars = int(total_reduction / 4.6)
+        # Average home uses ~10,000 kWh per year = ~4.9 tonnes CO2
+        homes = int(total_reduction / 4.9)
+        
         col1, col2, col3 = st.columns(3)
         with col1:
             st.markdown(f"""
