@@ -44,7 +44,7 @@ class CertificateGenerator:
         # Draw border
         self._draw_border(c, width, height, light_green, primary_green)
         
-        # Add header
+        # Add header (without logo)
         self._add_header(c, width, height, dark_green, light_green)
         
         # Add recipient info
@@ -53,7 +53,7 @@ class CertificateGenerator:
         # Add achievement (the star of the show)
         self._add_achievement(c, width, height, token, light_green, gold)
         
-        # Add verification section
+        # Add verification section (fixed layout)
         self._add_verification(c, width, height, token, gray, light_gray)
         
         # Add footer
@@ -80,28 +80,22 @@ class CertificateGenerator:
         c.rect(margin + 10, margin + 10, width - 2*margin - 20, height - 2*margin - 20, fill=0)
     
     def _add_header(self, c, width, height, dark_green, light_green):
-        """Add clean header section"""
-        y = height - 80
+        """Add clean header section without logo"""
+        y = height - 100
         
-        # Logo area (simple green square as logo)
-        logo_size = 40
-        c.setFillColor(dark_green)
-        c.rect(width/2 - logo_size/2, y - logo_size/2, logo_size, logo_size, fill=1)
-        
-        # Company name
-        y -= 60
-        c.setFont("Helvetica-Bold", 28)
+        # Company name (larger since no logo)
+        c.setFont("Helvetica-Bold", 32)
         c.setFillColor(dark_green)
         c.drawCentredString(width/2, y, "ECO-CHAIN")
         
         # Tagline
-        y -= 25
+        y -= 30
         c.setFont("Helvetica", 11)
         c.setFillColor(colors.HexColor('#424242'))
         c.drawCentredString(width/2, y, "Verifiable Sustainability Proof Platform")
         
         # Title
-        y -= 50
+        y -= 55
         c.setFont("Helvetica-Bold", 36)
         c.setFillColor(light_green)
         c.drawCentredString(width/2, y, "SUSTAINABILITY")
@@ -117,7 +111,7 @@ class CertificateGenerator:
     
     def _add_recipient(self, c, width, height, token, primary_green):
         """Add recipient information clearly"""
-        y = height - 340
+        y = height - 330
         
         # "Awarded to" text
         c.setFont("Helvetica", 13)
@@ -138,7 +132,7 @@ class CertificateGenerator:
     
     def _add_achievement(self, c, width, height, token, light_green, gold):
         """Highlight the achievement - this is the most important part"""
-        y = height - 440
+        y = height - 430
         
         # Achievement intro
         c.setFont("Helvetica", 12)
@@ -190,64 +184,71 @@ class CertificateGenerator:
         c.drawCentredString(width/2, y - 8, "✓")
     
     def _add_verification(self, c, width, height, token, gray, light_gray):
-        """Add verification details in clean box"""
-        y = 220
+        """Add verification details in clean box with proper spacing"""
+        y = 240
         
         # Background box
-        box_height = 110
+        box_height = 130
         box_width = width - 100
         box_x = 50
         
         c.setStrokeColor(colors.HexColor('#E0E0E0'))
         c.setFillColor(light_gray)
         c.setLineWidth(1)
-        c.rect(box_x, y - box_height, box_width, box_height, fill=1)
+        c.rect(box_x, y - box_height, box_width, box_height, fill=1, stroke=1)
         
         # Section title
         c.setFont("Helvetica-Bold", 11)
         c.setFillColor(gray)
-        c.drawString(box_x + 15, y - 20, "CRYPTOGRAPHIC VERIFICATION")
+        c.drawString(box_x + 15, y - 22, "CRYPTOGRAPHIC VERIFICATION")
         
-        # Verification details in two columns
-        c.setFont("Courier", 8)
-        c.setFillColor(colors.HexColor('#424242'))
-        
+        # Verification details - better spacing
         left_x = box_x + 15
-        right_x = box_x + box_width/2 + 15
+        right_x = box_x + box_width/2 + 10
         
         # Left column
-        y_pos = y - 45
+        y_pos = y - 48
         c.setFont("Helvetica-Bold", 8)
+        c.setFillColor(colors.HexColor('#424242'))
         c.drawString(left_x, y_pos, "Token ID:")
-        c.setFont("Courier", 7)
-        c.drawString(left_x, y_pos - 12, token['token_id'])
+        y_pos -= 14
+        c.setFont("Courier", 8)
+        c.drawString(left_x, y_pos, token['token_id'])
         
-        y_pos -= 30
+        y_pos -= 24
         c.setFont("Helvetica-Bold", 8)
+        c.setFillColor(colors.HexColor('#424242'))
         c.drawString(left_x, y_pos, "Timestamp:")
-        c.setFont("Courier", 7)
-        c.drawString(left_x, y_pos - 12, token['timestamp'][:19])
+        y_pos -= 14
+        c.setFont("Courier", 8)
+        c.drawString(left_x, y_pos, token['timestamp'][:19])
         
-        # Right column
-        y_pos = y - 45
+        # Right column - Verification Hash
+        y_pos = y - 48
         c.setFont("Helvetica-Bold", 8)
+        c.setFillColor(colors.HexColor('#424242'))
         c.drawString(right_x, y_pos, "Verification Hash:")
+        y_pos -= 14
         c.setFont("Courier", 7)
-        # Split hash into two lines for readability
+        # Split hash into multiple lines for better fit
         hash_str = token['hash']
-        c.drawString(right_x, y_pos - 12, hash_str[:40])
-        c.drawString(right_x, y_pos - 22, hash_str[40:] + "...")
+        c.drawString(right_x, y_pos, hash_str[:32])
+        y_pos -= 10
+        c.drawString(right_x, y_pos, hash_str[32:64])
         
-        y_pos -= 30
+        # Status at bottom of right column
+        y_pos -= 24
         c.setFont("Helvetica-Bold", 8)
+        c.setFillColor(colors.HexColor('#424242'))
         c.drawString(right_x, y_pos, "Status:")
-        c.setFont("Helvetica-Bold", 8)
+        y_pos -= 14
+        c.setFont("Helvetica-Bold", 9)
         c.setFillColor(colors.HexColor('#4CAF50'))
-        c.drawString(right_x, y_pos - 12, "VERIFIED ON IMMUTABLE LEDGER ✓")
+        c.drawString(right_x, y_pos, "VERIFIED ON IMMUTABLE LEDGER ✓")
     
     def _add_footer(self, c, width, height, gray):
         """Add clean footer"""
-        y = 80
+        y = 85
         
         # Certificate authenticity statement
         c.setFont("Helvetica", 9)
@@ -266,15 +267,3 @@ class CertificateGenerator:
         c.setFillColor(colors.HexColor('#9E9E9E'))
         c.drawCentredString(width/2, y,
                           f"Certificate Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        
-        # QR Code placeholder (centered)
-        y += 50
-        qr_size = 35
-        c.setStrokeColor(colors.HexColor('#BDBDBD'))
-        c.setFillColor(colors.HexColor('#FAFAFA'))
-        c.rect(width/2 - qr_size/2, y, qr_size, qr_size, fill=1)
-        
-        c.setFont("Helvetica", 6)
-        c.setFillColor(gray)
-        c.drawCentredString(width/2, y + qr_size/2 + 2, "VERIFY")
-        c.drawCentredString(width/2, y + qr_size/2 - 6, "ONLINE")
