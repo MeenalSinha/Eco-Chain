@@ -1261,7 +1261,8 @@ def show_insights():
         # Impact visualization
         st.subheader("🌍 Environmental Impact")
         
-        total_reduction = sum(t['emissions_reduced_tonnes'] for t in st.session_state.tokens)
+        # Calculate total reduction from kg field
+        total_reduction = sum(t['emissions_reduced_kg'] / 1000 for t in st.session_state.tokens)
         
         col1, col2, col3 = st.columns(3)
         with col1:
