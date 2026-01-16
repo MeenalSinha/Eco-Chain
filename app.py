@@ -884,61 +884,61 @@ def show_calculator():
         # Show token
         token = calc['token']
         st.subheader("🎖️ Verified Green Token")
-                
-                st.success(f"✅ Green Token Issued: {token['token_id']}")
-                
-                # Convert kg to tonnes for display only
-                emissions_reduced_tonnes = token['emissions_reduced_kg'] / 1000
-                
-                col1, col2 = st.columns([2, 1])
-                with col1:
-                    st.json({
-                        'token_id': token['token_id'],
-                        'sme_name': token['sme_name'],
-                        'business_type': token['business_type'],
-                        'emissions_reduced_kg': f"{token['emissions_reduced_kg']:.2f} kg",
-                        'emissions_reduced_tonnes': f"{emissions_reduced_tonnes:.4f} tonnes",
-                        'status': token['status'],
-                        'hash': token['hash'][:32] + '...'
-                    })
-                with col2:
-                    st.markdown(f"""
-                    <div class="glass-card">
-                        <h4 style="color: #2E7D32 !important;">Token Details</h4>
-                        <p><strong>Token ID:</strong> {token['token_id']}</p>
-                        <p><strong>Status:</strong> ✅ {token['status'].upper()}</p>
-                        <p><strong>Reduction:</strong> {token['emissions_reduced_kg']:.2f} kg (≈ {emissions_reduced_tonnes:.4f} tonnes)</p>
-                        <p><strong>Hash:</strong> <code>{token['hash'][:16]}...</code></p>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                # Generate certificate
-                st.subheader("📄 Download Sustainability Certificate")
-                
-                if st.button("Generate Certificate", key="gen_cert_calc"):
-                    with st.spinner("Generating certificate..."):
-                        try:
-                            cert_generator = st.session_state.certificate_generator
-                            
-                            st.info("Generating certificate...")
-                            
-                            pdf_bytes = cert_generator.generate_certificate(token)
-                            
-                            st.success("✅ Certificate generated successfully!")
-                            
-                            st.download_button(
-                                label="📥 Download Certificate (PDF)",
-                                data=pdf_bytes,
-                                file_name=f"Sustainability_Certificate_{token['token_id']}.pdf",
-                                mime="application/pdf",
-                                key="dl_cert_calc"
-                            )
-                        except Exception as e:
-                            st.error(f"❌ Error generating certificate: {str(e)}")
-                            st.error(f"Error type: {type(e).__name__}")
-                            import traceback
-                            st.code(traceback.format_exc())
-                            st.info("💡 Please try again or contact support if the issue persists.")
+        
+        st.success(f"✅ Green Token Issued: {token['token_id']}")
+        
+        # Convert kg to tonnes for display only
+        emissions_reduced_tonnes = token['emissions_reduced_kg'] / 1000
+        
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            st.json({
+                'token_id': token['token_id'],
+                'sme_name': token['sme_name'],
+                'business_type': token['business_type'],
+                'emissions_reduced_kg': f"{token['emissions_reduced_kg']:.2f} kg",
+                'emissions_reduced_tonnes': f"{emissions_reduced_tonnes:.4f} tonnes",
+                'status': token['status'],
+                'hash': token['hash'][:32] + '...'
+            })
+        with col2:
+            st.markdown(f"""
+            <div class="glass-card">
+                <h4 style="color: #2E7D32 !important;">Token Details</h4>
+                <p><strong>Token ID:</strong> {token['token_id']}</p>
+                <p><strong>Status:</strong> ✅ {token['status'].upper()}</p>
+                <p><strong>Reduction:</strong> {token['emissions_reduced_kg']:.2f} kg (≈ {emissions_reduced_tonnes:.4f} tonnes)</p>
+                <p><strong>Hash:</strong> <code>{token['hash'][:16]}...</code></p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # Generate certificate
+        st.subheader("📄 Download Sustainability Certificate")
+        
+        if st.button("Generate Certificate", key="gen_cert_calc"):
+            with st.spinner("Generating certificate..."):
+                try:
+                    cert_generator = st.session_state.certificate_generator
+                    
+                    st.info("Generating certificate...")
+                    
+                    pdf_bytes = cert_generator.generate_certificate(token)
+                    
+                    st.success("✅ Certificate generated successfully!")
+                    
+                    st.download_button(
+                        label="📥 Download Certificate (PDF)",
+                        data=pdf_bytes,
+                        file_name=f"Sustainability_Certificate_{token['token_id']}.pdf",
+                        mime="application/pdf",
+                        key="dl_cert_calc"
+                    )
+                except Exception as e:
+                    st.error(f"❌ Error generating certificate: {str(e)}")
+                    st.error(f"Error type: {type(e).__name__}")
+                    import traceback
+                    st.code(traceback.format_exc())
+                    st.info("💡 Please try again or contact support if the issue persists.")
 
 def show_tokens():
     st.header("🎖️ My Green Tokens")
