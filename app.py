@@ -889,25 +889,39 @@ def show_calculator():
                 
                 # Generate certificate
                 st.subheader("📄 Download Sustainability Certificate")
+                
+                # Store latest token ID in session state for certificate generation
+                if 'latest_token_id' not in st.session_state or st.session_state.latest_token_id != token['token_id']:
+                    st.session_state.latest_token_id = token['token_id']
+                
                 if st.button("Generate Certificate", key="gen_cert_calc"):
                     with st.spinner("Generating certificate..."):
                         try:
-                            cert_generator = st.session_state.certificate_generator
+                            # Get the token from session state tokens list
+                            latest_token = None
+                            for t in st.session_state.tokens:
+                                if t['token_id'] == st.session_state.latest_token_id:
+                                    latest_token = t
+                                    break
                             
-                            # Debug: Show token structure
-                            st.info("Token structure confirmed. Generating PDF...")
-                            
-                            pdf_bytes = cert_generator.generate_certificate(token)
-                            
-                            st.success("✅ Certificate generated successfully!")
-                            
-                            st.download_button(
-                                label="📥 Download Certificate (PDF)",
-                                data=pdf_bytes,
-                                file_name=f"Sustainability_Certificate_{token['token_id']}.pdf",
-                                mime="application/pdf",
-                                key="dl_cert_calc"
-                            )
+                            if latest_token is None:
+                                st.error("❌ Token not found. Please recalculate emissions.")
+                            else:
+                                cert_generator = st.session_state.certificate_generator
+                                
+                                st.info("Generating certificate...")
+                                
+                                pdf_bytes = cert_generator.generate_certificate(latest_token)
+                                
+                                st.success("✅ Certificate generated successfully!")
+                                
+                                st.download_button(
+                                    label="📥 Download Certificate (PDF)",
+                                    data=pdf_bytes,
+                                    file_name=f"Sustainability_Certificate_{latest_token['token_id']}.pdf",
+                                    mime="application/pdf",
+                                    key="dl_cert_calc"
+                                )
                         except Exception as e:
                             st.error(f"❌ Error generating certificate: {str(e)}")
                             st.error(f"Error type: {type(e).__name__}")
