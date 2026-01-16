@@ -232,7 +232,7 @@ class CertificateGenerator:
         """Add certificate footer"""
         y = self.margin + 60
         
-        c.setFont("Helvetica-Italic", 9)
+        c.setFont("Helvetica", 9)  # Changed from Helvetica-Italic
         c.setFillColor(colors.HexColor('#757575'))
         c.drawCentredString(width/2, y, 
                           "This certificate is cryptographically verified and tamper-proof")
