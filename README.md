@@ -2,7 +2,7 @@
 
 **Eco-Chain transforms electricity consumption data into cryptographically verified sustainability certificates that SMEs can share with buyers, banks, and regulators—without expensive audits.**
 
-Built by: [Your Name/Team Name] | Competition: Ideas for India Innovation Challenge 2025
+Built by: Meenal Sinha: NeuroIgniter | Competition: RedBrick Hacks III
 
 ---
 
@@ -188,9 +188,6 @@ February 2025,7800
 
 ## Additional Documentation
 
-- **QUICKSTART.md** - 3-minute setup guide
-- **USER_GUIDE.md** - Detailed walkthrough with screenshots
-- **SUBMISSION_DESCRIPTION.md** - Competition pitch (90-second demo)
 - **sample_data.csv** - Test data included
 
 ---
