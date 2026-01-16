@@ -1201,24 +1201,24 @@ def show_insights():
                 color = priority_colors.get(suggestion.get('priority', 'Medium'), "#3498DB")
                 
                 with st.expander(f"💡 {suggestion['title']} - Priority: {suggestion.get('priority', 'Medium')}", expanded=(i==0)):
-                    st.markdown(f"""
-                    <div class="glass-card" style="border-left: 4px solid {color};">
-                        <h4 style="color: #2E7D32 !important;">{suggestion['title']}</h4>
-                        <p style="color: #666; line-height: 1.8;"><strong>Description:</strong> {suggestion['description']}</p>
-                        
-                        <p style="color: #666;"><strong>Expected Impact:</strong> {suggestion.get('impact', 'N/A')}</p>
-                        <p style="color: #666;"><strong>CO₂ Reduction:</strong> {suggestion.get('co2_reduction', 'N/A')}</p>
-                        <p style="color: #666;"><strong>Estimated Cost:</strong> {suggestion.get('cost', 'N/A')}</p>
-                        <p style="color: #666;"><strong>Payback Period:</strong> {suggestion.get('payback', 'N/A')}</p>
-                        
-                        <h5 style="color: #2E7D32 !important; margin-top: 1rem;">Implementation Steps:</h5>
-                        <ol style="color: #666; line-height: 1.8;">
-                    """, unsafe_allow_html=True)
+                    # Use Streamlit native components for better rendering
+                    st.markdown(f"**Description:** {suggestion['description']}")
                     
-                    for step in suggestion.get('steps', []):
-                        st.markdown(f"<li>{step}</li>", unsafe_allow_html=True)
+                    st.markdown("---")
                     
-                    st.markdown("</ol></div>", unsafe_allow_html=True)
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.markdown(f"**Expected Impact:** {suggestion.get('impact', 'N/A')}")
+                        st.markdown(f"**CO₂ Reduction:** {suggestion.get('co2_reduction', 'N/A')}")
+                    with col2:
+                        st.markdown(f"**Estimated Cost:** {suggestion.get('cost', 'N/A')}")
+                        st.markdown(f"**Payback Period:** {suggestion.get('payback', 'N/A')}")
+                    
+                    st.markdown("---")
+                    st.markdown("**Implementation Steps:**")
+                    
+                    for idx, step in enumerate(suggestion.get('steps', []), 1):
+                        st.markdown(f"{idx}. {step}")
             
             # Quick wins section
             st.markdown("---")
